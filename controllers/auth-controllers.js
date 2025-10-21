@@ -65,7 +65,7 @@ const login = async (req, res) => {
       });
     }
 
-    //bearer token can be added here for further security enhancements (MOVE IT HERE!)
+    //bearer token can be added here for further security enhancements 
     const accessToken = jwt.sign(
       {
         userId: user._id,
