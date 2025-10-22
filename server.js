@@ -4,6 +4,7 @@ import connectDB from './db/dbConfig.js';
 import authRoutes from './routes/authRoutes.js';
 import homeRoutes from './routes/home-routes.js';
 import adminRoutes from './routes/admin-routes.js';
+import imageRoutes from './routes/image-routes.js';
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/images', imageRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

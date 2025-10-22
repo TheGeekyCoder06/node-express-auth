@@ -65,7 +65,7 @@ const login = async (req, res) => {
       });
     }
 
-    //bearer token can be added here for further security enhancements 
+    //bearer token can be added here for further security enhancements
     const accessToken = jwt.sign(
       {
         userId: user._id,
@@ -76,7 +76,7 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    
+
     // if everything is fine, respond with success message AND the token
     res.status(200).json({
       success: true,
@@ -84,7 +84,6 @@ const login = async (req, res) => {
       user: user,
       token: accessToken,
     });
-
   } catch (err) {
     console.log("Login error:", err);
     res.status(500).json({
@@ -93,4 +92,51 @@ const login = async (req, res) => {
     });
   }
 };
-export { register, login };
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.userInfo.userId;
+
+    // extract old and new passwords from request body
+    const { oldPassword, newPassword } = req.body;
+
+    // find the current logged in user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    // compare the old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Old password is incorrect",
+        success: false,
+      });
+    }
+
+    // hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    // update the user's password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({
+      message: "Password changed successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.log("Error changing password:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export { register, login , changePassword };
